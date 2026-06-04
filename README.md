@@ -1,4 +1,5 @@
 # Sagavar - Offline Language Tutor
+![Screenshot dell'interfaccia di Sagavar](screenshot.png)
 
 ## Requirements
 
