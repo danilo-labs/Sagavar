@@ -3,7 +3,7 @@
 
 ## Requirements
 
-- Linux (Simply Linux, Ubuntu, Debian, etc.)
+- Linux (ALT Linux, Ubuntu, Debian, etc.)
 - 4 GB RAM (8 GB recommended)
 - 5 GB free disk space
 - Python 3 (usually pre-installed; if not: `sudo apt install python3`)
