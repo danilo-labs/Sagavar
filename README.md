@@ -9,6 +9,13 @@
 - Python 3 (usually pre-installed; if not: `sudo apt install python3`)
 - Internet connection only for the initial download of the model and KoboldCpp
 
+**Note**: This project is under active development. Future versions will include improved model support (e.g., Qwen 3B, fine-tuned Russian models) and better handling of complex grammar and idioms.
+
+## Known limitations
+- The 1.5B model may make mistakes in advanced Russian grammar and Chinese idioms.
+- For complex questions (proverbs, grammar differences), the assistant might give incorrect answers or ask to rephrase.
+- Recommended use: basic translations, conversation practice, and simple vocabulary.
+
 ---
 
 ## 🇬🇧 English
