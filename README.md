@@ -12,7 +12,7 @@
 **Note**: This project is under active development. Future versions will include improved model support (e.g., Qwen 3B, fine-tuned Russian models) and better handling of complex grammar and idioms.
 
 ## Known limitations
-- The 1.5B model may make mistakes in advanced Russian grammar and Chinese idioms.
+- The **Qwen 2.5 1.5B** quantized model may make mistakes in advanced Russian grammar and Chinese idioms.
 - For complex questions (proverbs, grammar differences), the assistant might give incorrect answers or ask to rephrase.
 - Recommended use: basic translations, conversation practice, and simple vocabulary.
 
