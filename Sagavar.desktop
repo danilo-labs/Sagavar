@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Application
+Name=Sagavar
+Comment=Offline language tutor
+Exec=/bin/bash -c "cd \"$HOME/Desktop/Sagavar\" && ./avvia_sagavar.sh"
+Icon=applications-science
+Terminal=true
+StartupNotify=true
+Categories=Education;
