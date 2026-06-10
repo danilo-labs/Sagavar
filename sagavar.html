@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Sagavar · Language Tutor</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600&display=swap" rel="stylesheet">
+    <style>
+        /* ========== STILI (TEMA CHIARO/SCURO) – LASCIATI INVARIATI ========== */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', sans-serif; height: 100vh; display: flex; flex-direction: column; overflow: hidden; transition: background 0.2s, color 0.2s; }
+        body.light { background-color: #f9fafb; color: #111827; }
+        body.light .header { background-color: rgba(255,255,255,0.8); backdrop-filter: blur(10px); border-bottom: 1px solid #e5e7eb; }
+        body.light .header h1 { color: #111827; }
+        body.light .header p { color: #6b7280; }
+        body.light .chat-container { background-color: #f9fafb; }
+        body.light .message.user { color: #111827; border-left-color: #3b82f6; }
+        body.light .message.assistant { color: #4b5563; border-left-color: #d1d5db; }
+        body.light .input-panel { background-color: rgba(255,255,255,0.8); backdrop-filter: blur(10px); border-top: 1px solid #e5e7eb; }
+        body.light .input-group { background-color: #ffffff; border: 1px solid #e5e7eb; }
+        body.light .input-group:focus-within { border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59,130,246,0.1); }
+        body.light #message { color: #111827; }
+        body.light #message::placeholder { color: #6b7280; }
+        body.light button { background-color: #111827; color: white; }
+        body.light button:hover { background-color: #374151; }
+        body.light .status { color: #6b7280; }
+        body.light .sidebar { background: rgba(255,255,255,0.6); border-left-color: #e5e7eb; }
+        body.light .sidebar-section { border-bottom-color: #e5e7eb; }
+        body.light .sidebar-section h3 { color: #1f2937; }
+        body.light .convo-list li button.delete-convo { color: #6b7280; }
+        body.light .convo-list li button.delete-convo:hover { background: #e5e7eb; }
+        body.dark { background-color: #0f172a; color: #e2e8f0; }
+        body.dark .header { background-color: rgba(15,23,42,0.8); backdrop-filter: blur(10px); border-bottom: 1px solid #1e293b; }
+        body.dark .header h1 { color: #e2e8f0; }
+        body.dark .header p { color: #94a3b8; }
+        body.dark .chat-container { background-color: #0f172a; }
+        body.dark .message.user { color: #e2e8f0; border-left-color: #38bdf8; }
+        body.dark .message.assistant { color: #94a3b8; border-left-color: #334155; }
+        body.dark .input-panel { background-color: rgba(15,23,42,0.8); backdrop-filter: blur(10px); border-top: 1px solid #1e293b; }
+        body.dark .input-group { background-color: #1e293b; border: 1px solid #334155; }
+        body.dark .input-group:focus-within { border-color: #38bdf8; box-shadow: 0 0 0 3px rgba(56,189,248,0.1); }
+        body.dark #message { color: #f1f5f9; }
+        body.dark #message::placeholder { color: #64748b; }
+        body.dark button { background-color: #38bdf8; color: #0f172a; }
+        body.dark button:hover { background-color: #7dd3fc; }
+        body.dark .status { color: #64748b; }
+        body.dark .sidebar { background: rgba(15,23,42,0.8); border-left-color: #1e293b; }
+        body.dark .sidebar-section { border-bottom-color: #1e293b; }
+        body.dark .sidebar-section h3 { color: #cbd5e1; }
+        body.dark .convo-list li button.delete-convo { color: #94a3b8; }
+        body.dark .convo-list li button.delete-convo:hover { background: #1e293b; }
+        body.light .lang-btn.active { background: #3b82f6; color: white; }
+        body.light .lang-btn:not(.active):hover { background: #e5e7eb; }
+        body.dark .lang-btn { background: transparent; color: #94a3b8; }
+        body.dark .lang-btn.active { background: #38bdf8; color: #0f172a; }
+        body.dark .lang-btn:not(.active):hover { background: #1e293b; }
+        .header { padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; }
+        .header-left { display: flex; flex-direction: column; }
+        .header-controls { display: flex; gap: 0.5rem; align-items: center; }
+        .lang-selector { display: flex; gap: 4px; background: rgba(0,0,0,0.05); border-radius: 2rem; padding: 0.2rem; }
+        .lang-btn { background: transparent; border: none; font-size: 0.8rem; font-weight: 500; padding: 0.3rem 0.7rem; border-radius: 2rem; cursor: pointer; transition: all 0.1s; color: inherit; }
+        #themeToggle { background: transparent; border: none; font-size: 1.3rem; cursor: pointer; padding: 0.4rem; border-radius: 50%; width: 36px; height: 36px; display: inline-flex; align-items: center; justify-content: center; }
+        body.light #themeToggle:hover { background-color: #e5e7eb; }
+        body.dark #themeToggle:hover { background-color: #1e293b; }
+        .header-text h1 { font-size: 1.5rem; font-weight: 600; letter-spacing: -0.3px; }
+        .header-text p { font-size: 0.8rem; margin-top: 2px; }
+        .app-wrapper { display: flex; flex: 1; overflow: hidden; }
+        .main-content { flex: 1; display: flex; flex-direction: column; overflow: hidden; min-width: 0; }
+        .sidebar { width: 280px; backdrop-filter: blur(8px); border-left: 1px solid; display: flex; flex-direction: column; padding: 1rem; gap: 1.5rem; overflow-y: auto; flex-shrink: 0; }
+        @media (max-width: 1000px) { .sidebar { display: none; } }
+        .sidebar-section { border-bottom: 1px solid; padding-bottom: 1rem; }
+        .sidebar-section h3 { font-size: 0.8rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 0.8rem; }
+        .convo-list { list-style: none; margin: 0; padding: 0; }
+        .convo-list li { display: flex; justify-content: space-between; align-items: center; padding: 0.5rem; margin-bottom: 0.25rem; border-radius: 0.5rem; font-size: 0.85rem; }
+        .convo-list li span { cursor: pointer; flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .convo-list li button.delete-convo { background: none; border: none; cursor: pointer; font-size: 0.8rem; padding: 0 4px; border-radius: 4px; }
+        .new-chat-btn { background: #3b82f6; color: white; border: none; width: 100%; padding: 0.5rem; border-radius: 2rem; font-weight: 500; cursor: pointer; margin-bottom: 0.5rem; }
+        .clear-all-btn { background-color: #ef4444; margin-top: 0.5rem; }
+        body.dark .new-chat-btn { background: #38bdf8; color: #0f172a; }
+        body.dark .clear-all-btn { background-color: #dc2626; color: white; }
+        .context-item { font-size: 0.85rem; margin-bottom: 0.4rem; }
+        .context-label { font-weight: 600; margin-right: 0.3rem; }
+        .chat-container { flex: 1; overflow-y: auto; padding: 1.5rem 2rem; scroll-behavior: smooth; }
+        .message { max-width: 800px; margin: 0 auto 1.2rem auto; padding: 0.75rem 0 0.75rem 1rem; line-height: 1.5; font-size: 0.95rem; animation: fadeSlideUp 0.2s ease; border-left-width: 3px; border-left-style: solid; }
+        @media (min-width: 1400px) { .message { max-width: 1000px; } }
+        .message.user { border-left-color: #3b82f6; }
+        .message.assistant { border-left-color: #d1d5db; }
+        body.dark .message.user { border-left-color: #38bdf8; }
+        body.dark .message.assistant { border-left-color: #334155; }
+        .input-panel { flex-shrink: 0; padding: 1rem 2rem 1.5rem; border-top: 1px solid; }
+        .input-group { max-width: 800px; margin: 0 auto; display: flex; gap: 12px; align-items: center; border-radius: 2rem; padding: 0.25rem 0.25rem 0.25rem 1.5rem; transition: all 0.2s; }
+        #message { flex: 1; background: transparent; border: none; padding: 0.85rem 0; font-size: 0.95rem; outline: none; font-family: inherit; }
+        button { border: none; padding: 0.6rem 1.5rem; border-radius: 2rem; font-weight: 500; font-size: 0.85rem; cursor: pointer; transition: all 0.15s; }
+        button:active { transform: scale(0.97); }
+        .status { text-align: center; font-size: 0.7rem; margin-top: 0.75rem; display: flex; align-items: center; justify-content: center; gap: 6px; }
+        .status-dot { width: 6px; height: 6px; background-color: #10b981; border-radius: 50%; display: inline-block; box-shadow: 0 0 4px #10b981; }
+        @keyframes fadeSlideUp { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+        .chat-container::-webkit-scrollbar { width: 5px; }
+        .chat-container::-webkit-scrollbar-track { background: transparent; }
+        body.light .chat-container::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        body.dark .chat-container::-webkit-scrollbar-thumb { background: #334155; border-radius: 10px; }
+    </style>
+</head>
+<body class="light">
+    <div class="header">
+        <div class="header-left">
+            <div class="header-text">
+                <h1>Sagavar</h1>
+                <p id="headerSubtitle">offline AI tutor · English · Russian · Chinese</p>
+            </div>
+        </div>
+        <div class="header-controls">
+            <div class="lang-selector">
+                <button data-lang="en" class="lang-btn active">🇬🇧 EN</button>
+                <button data-lang="ru" class="lang-btn">🇷🇺 RU</button>
+                <button data-lang="zh" class="lang-btn">🇨🇳 中文</button>
+            </div>
+            <button id="themeToggle" aria-label="Toggle theme">🌙</button>
+        </div>
+    </div>
+
+    <div class="app-wrapper">
+        <div class="main-content">
+            <div class="chat-container"><div id="chat"></div></div>
+            <div class="input-panel">
+                <div class="input-group">
+                    <input type="text" id="message" placeholder="Ask me a language question..." autofocus>
+                    <button id="sendBtn">Send →</button>
+                </div>
+                <div class="status"><span class="status-dot"></span><span id="status">Ready</span></div>
+            </div>
+        </div>
+        <div class="sidebar">
+            <div class="sidebar-section">
+                <button id="newChatSidebarBtn" class="new-chat-btn">✨ New conversation</button>
+                <button id="clearAllConversationsBtn" class="new-chat-btn clear-all-btn">🗑️ Clear all</button>
+            </div>
+            <div class="sidebar-section">
+                <h3 id="conversationsTitle">💬 Conversations</h3>
+                <ul id="conversationsList" class="convo-list"><li>No saved conversations</li></ul>
+            </div>
+            <div class="sidebar-section">
+                <h3 id="contextTitle">📌 Current context</h3>
+                <div id="contextDisplay"><div class="context-item">No stored data</div></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ===================== TRADUZIONI =====================
+        const translations = {
+            en: {
+                headerSubtitle: "offline AI tutor · English · Russian · Chinese",
+                placeholder: "Ask me a language question...",
+                sendBtn: "Send →",
+                statusReady: "Ready",
+                statusThinking: "Sagavar is thinking...",
+                statusServerError: "Server error",
+                newChatBtn: "✨ New conversation",
+                clearAllBtn: "🗑️ Clear all",
+                conversationsTitle: "💬 Conversations",
+                contextTitle: "📌 Current context",
+                noConversations: "No saved conversations",
+                noContext: "No stored data",
+                confirmDeleteSingle: "Delete this conversation?",
+                confirmDeleteAll: "Delete all saved conversations?",
+                deletedSingle: "Conversation deleted",
+                deletedAll: "All conversations deleted",
+                errorServer: "⚠️ Server unreachable. Make sure KoboldCpp is running on port 5001.",
+                welcomeMessage: "Hello! I'm Sagavar, your offline language tutor. Ask me about English, Russian, or Chinese.",
+                wrongLanguageReply: "⚠️ I'm sorry, I can only answer in the language you used. Please ask again in English, Russian, or Chinese."
+            },
+            ru: {
+                headerSubtitle: "офлайн AI репетитор · Английский · Русский · Китайский",
+                placeholder: "Задайте вопрос о языке...",
+                sendBtn: "Отправить →",
+                statusReady: "Готов",
+                statusThinking: "Sagavar думает...",
+                statusServerError: "Ошибка сервера",
+                newChatBtn: "✨ Новый чат",
+                clearAllBtn: "🗑️ Удалить все",
+                conversationsTitle: "💬 Диалоги",
+                contextTitle: "📌 Текущий контекст",
+                noConversations: "Нет сохранённых диалогов",
+                noContext: "Нет сохранённых данных",
+                confirmDeleteSingle: "Удалить этот диалог?",
+                confirmDeleteAll: "Удалить все сохранённые диалоги?",
+                deletedSingle: "Диалог удалён",
+                deletedAll: "Все диалоги удалены",
+                errorServer: "⚠️ Сервер недоступен. Убедитесь, что KoboldCpp запущен на порту 5001.",
+                welcomeMessage: "Привет! Я Sagavar, ваш офлайн репетитор языков. Спрашивайте меня об английском, русском или китайском.",
+                wrongLanguageReply: "⚠️ Извините, я могу отвечать только на том языке, который вы использовали. Пожалуйста, спросите снова на английском, русском или китайском."
+            },
+            zh: {
+                headerSubtitle: "离线AI导师 · 英语 · 俄语 · 中文",
+                placeholder: "提出语言问题...",
+                sendBtn: "发送 →",
+                statusReady: "就绪",
+                statusThinking: "Sagavar 思考中...",
+                statusServerError: "服务器错误",
+                newChatBtn: "✨ 新对话",
+                clearAllBtn: "🗑️ 全部删除",
+                conversationsTitle: "💬 对话记录",
+                contextTitle: "📌 当前上下文",
+                noConversations: "无保存的对话",
+                noContext: "无存储的数据",
+                confirmDeleteSingle: "删除此对话？",
+                confirmDeleteAll: "删除所有保存的对话？",
+                deletedSingle: "对话已删除",
+                deletedAll: "所有对话已删除",
+                errorServer: "⚠️ 服务器无法访问。请确保 KoboldCpp 在端口 5001 上运行。",
+                welcomeMessage: "你好！我是 Sagavar，您的离线语言导师。请问我关于英语、俄语或中文的问题。",
+                wrongLanguageReply: "⚠️ 抱歉，我只能用您使用的语言回答。请用英语、俄语或中文重新提问。"
+            }
+        };
+
+        let currentLang = 'en';
+
+        const SYSTEM_PROMPT = `You are Sagavar, a friendly language tutor for English, Russian, Chinese.
+
+CRITICAL RULES (must follow in this order):
+1. The user's language is the ONLY language you should answer in. 
+   - If the user writes in English → you MUST answer in English.
+   - If the user writes in Russian → you MUST answer in Russian.
+   - If the user writes in Chinese → you MUST answer in Chinese.
+2. NEVER switch language unless the user explicitly asks for a translation.
+3. When the user asks for a phrase in a specific language (e.g., "in Russian", "in Chinese"), answer ONLY in that language.
+4. For English grammar questions: answer ONLY in English. Never use Russian or Chinese characters.
+5. For Chinese: always provide pinyin in parentheses (e.g., 你好 nǐ hǎo).
+6. For Russian: use Cyrillic alphabet. If unsure, say "I need to check".
+7. Remember what the user tells you (name, preferences, etc.) during the conversation.
+8. Keep answers short, clear, and helpful.
+9. Your name is Sagavar.
+10. When introducing yourself, say: "Hello, I'm Sagavar, your offline language tutor."
+
+--- Examples of WRONG behavior (NEVER do this) ---
+User: Say 'hello' in Chinese.
+WRONG: Hello (English)
+WRONG: 你好 (without pinyin)
+CORRECT: 你好 (nǐ hǎo)
+
+User: Translate 'thank you' into Russian.
+WRONG: Спасибо (that is correct, but the point is to answer in Russian)
+CORRECT: Спасибо
+
+User: My name is Olga.
+WRONG: 你好，Olga！
+CORRECT: Hello, Olga! Nice to meet you.
+
+--- Good examples ---
+User: How to say 'hello' in Chinese?
+Assistant: 你好 (nǐ hǎo)
+
+User: What is the Russian word for 'goodbye'?
+Assistant: до свидания
+
+User: Translate 'Thank you' into Russian.
+Assistant: Спасибо
+
+User: Say 'good morning' in Chinese.
+Assistant: 早上好 (zǎoshang hǎo)`;
+
+        let conversation = [
+            { role: "system", content: SYSTEM_PROMPT },
+            { role: "assistant", content: translations.en.welcomeMessage }
+        ];
+        let currentConversationId = null;
+
+        const chatDiv = document.getElementById('chat');
+        const statusSpan = document.getElementById('status');
+        const messageInput = document.getElementById('message');
+        const sendBtn = document.getElementById('sendBtn');
+        const conversationsListEl = document.getElementById('conversationsList');
+        const contextDisplayEl = document.getElementById('contextDisplay');
+
+        function escapeHtml(text) { const div = document.createElement('div'); div.textContent = text; return div.innerHTML; }
+        function appendMessage(role, content) { const msgDiv = document.createElement('div'); msgDiv.className = `message ${role}`; msgDiv.innerHTML = escapeHtml(content); chatDiv.appendChild(msgDiv); document.querySelector('.chat-container').scrollTop = document.querySelector('.chat-container').scrollHeight; }
+        function renderChat() { chatDiv.innerHTML = ''; for (let msg of conversation) if (msg.role !== 'system') appendMessage(msg.role, msg.content); }
+        function trimConversation() { const MAX_TURNS = 6; if (conversation.length > MAX_TURNS*2+1) { const keepSystem = conversation[0]; const lastMessages = conversation.slice(-MAX_TURNS*2); conversation = [keepSystem, ...lastMessages]; } }
+
+        function detectLanguage(text) {
+            if (/[\u4e00-\u9fff]/.test(text)) return 'zh';
+            if (/[\u0400-\u04FF]/.test(text)) return 'ru';
+            return 'en';
+        }
+
+        // Verifica se la risposta è nella lingua sbagliata
+        function isWrongLanguageResponse(userMsg, reply) {
+            const userLang = detectLanguage(userMsg);
+            const replyLang = detectLanguage(reply);
+            if (userLang === 'en' && (replyLang === 'zh' || replyLang === 'ru')) return true;
+            if (userLang === 'zh' && replyLang === 'en') return true;
+            if (userLang === 'ru' && replyLang === 'en') return true;
+            return false;
+        }
+
+        // Filtro minimale per domande non linguistiche
+        function isNonLanguageQuestion(text) {
+            const lower = text.toLowerCase();
+            const blocked = ["capital", "2+2", "3+3", "4+4", "math", "solve", "calculate", "joke", "tell me a joke", "funny", "weather"];
+            return blocked.some(kw => lower.includes(kw));
+        }
+
+        function extractContext() {
+            let name = null, city = null, languages = [];
+            for (let msg of conversation) {
+                if (msg.role !== 'user') continue;
+                const lower = msg.content.toLowerCase();
+                let match = lower.match(/(?:my name is|i'm|i am|call me) (\w+)/i);
+                if (match && !name) name = match[1];
+                match = lower.match(/(?:i live in|from) (\w+)/i);
+                if (match && !city) city = match[1];
+                match = lower.match(/i study (.+)/i);
+                if (match) languages.push(...match[1].split(/ and |, /));
+            }
+            const t = translations[currentLang];
+            contextDisplayEl.innerHTML = '';
+            if (name) contextDisplayEl.innerHTML += `<div class="context-item"><span class="context-label">${currentLang==='en'?'Name:':(currentLang==='ru'?'Имя:':'姓名:')}</span> ${escapeHtml(name)}</div>`;
+            if (city) contextDisplayEl.innerHTML += `<div class="context-item"><span class="context-label">${currentLang==='en'?'City:':(currentLang==='ru'?'Город:':'城市:')}</span> ${escapeHtml(city)}</div>`;
+            if (languages.length) contextDisplayEl.innerHTML += `<div class="context-item"><span class="context-label">${currentLang==='en'?'Languages:':(currentLang==='ru'?'Языки:':'语言:')}</span> ${escapeHtml(languages.join(', '))}</div>`;
+            if (!name && !city && !languages.length) contextDisplayEl.innerHTML = `<div class="context-item">${t.noContext}</div>`;
+        }
+
+        // localStorage conversation storage (semplificato)
+        function getStoredConversations() { const stored = localStorage.getItem('sagavar_conversations'); return stored ? JSON.parse(stored) : []; }
+        function saveConversationsToStorage(convs) { localStorage.setItem('sagavar_conversations', JSON.stringify(convs)); }
+        function saveCurrentConversation() {
+            if (conversation.length <= 1) return;
+            let convs = getStoredConversations();
+            if (currentConversationId) {
+                const idx = convs.findIndex(c => c.id === currentConversationId);
+                if (idx !== -1) convs[idx] = { id: currentConversationId, title: generateTitleFromConversation(conversation), timestamp: Date.now(), messages: JSON.parse(JSON.stringify(conversation)) };
+                else convs.unshift({ id: Date.now().toString(), title: generateTitleFromConversation(conversation), timestamp: Date.now(), messages: JSON.parse(JSON.stringify(conversation)) });
+            } else {
+                const newId = Date.now().toString();
+                convs.unshift({ id: newId, title: generateTitleFromConversation(conversation), timestamp: Date.now(), messages: JSON.parse(JSON.stringify(conversation)) });
+                currentConversationId = newId;
+            }
+            if (convs.length > 20) convs.pop();
+            saveConversationsToStorage(convs);
+            renderConversationsList();
+        }
+        function generateTitleFromConversation(conv) { const first = conv.find(m => m.role === 'user'); return first ? first.content.slice(0,40) + (first.content.length>40?'…':'') : new Date().toLocaleString(); }
+        function loadConversation(id) {
+            const convs = getStoredConversations();
+            const found = convs.find(c => c.id === id);
+            if (found) {
+                conversation = JSON.parse(JSON.stringify(found.messages));
+                if (conversation[0]?.role !== 'system') conversation.unshift({ role: "system", content: SYSTEM_PROMPT });
+                else conversation[0].content = SYSTEM_PROMPT;
+                currentConversationId = id;
+                renderChat(); extractContext(); statusSpan.innerText = translations[currentLang].statusReady;
+            }
+        }
+        function newConversation() {
+            if (conversation.length > 1) saveCurrentConversation();
+            conversation = [{ role: "system", content: SYSTEM_PROMPT }, { role: "assistant", content: translations[currentLang].welcomeMessage }];
+            currentConversationId = null;
+            renderChat(); extractContext(); statusSpan.innerText = translations[currentLang].statusReady; messageInput.focus();
+        }
+        function renderConversationsList() {
+            const convs = getStoredConversations();
+            const t = translations[currentLang];
+            if (!convs.length) { conversationsListEl.innerHTML = `<li>${t.noConversations}</li>`; return; }
+            let html = '';
+            for (let c of convs) html += `<li data-id="${c.id}"><span>${escapeHtml(c.title)}</span><button class="delete-convo" data-id="${c.id}">🗑️</button></li>`;
+            conversationsListEl.innerHTML = html;
+            document.querySelectorAll('#conversationsList li span').forEach(span => span.addEventListener('click', (e) => { const id = span.closest('li').getAttribute('data-id'); if(id) loadConversation(id); }));
+            document.querySelectorAll('#conversationsList .delete-convo').forEach(btn => btn.addEventListener('click', (e) => { e.stopPropagation(); const id = btn.getAttribute('data-id'); if(confirm(t.confirmDeleteSingle)){ let convs = getStoredConversations(); convs = convs.filter(c=>c.id!==id); saveConversationsToStorage(convs); if(currentConversationId===id) currentConversationId=null; renderConversationsList(); }}));
+        }
+        function clearAllConversations() { const t = translations[currentLang]; if(confirm(t.confirmDeleteAll)){ localStorage.removeItem('sagavar_conversations'); currentConversationId=null; renderConversationsList(); } }
+
+        // Funzione principale con RETRY sulla lingua
+        async function sendMessage() {
+            const userText = messageInput.value.trim();
+            if (!userText || userText.length > 600) return;
+
+            if (isNonLanguageQuestion(userText)) {
+                appendMessage('assistant', translations[currentLang].wrongLanguageReply);
+                statusSpan.innerText = translations[currentLang].statusReady;
+                return;
+            }
+
+            messageInput.value = '';
+            appendMessage('user', userText);
+            conversation.push({ role: "user", content: userText });
+            statusSpan.innerText = translations[currentLang].statusThinking;
+            sendBtn.disabled = true;
+
+            try {
+                // Primo tentativo
+                const response = await fetch('http://localhost:5001/v1/chat/completions', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        messages: conversation,
+                        max_tokens: 1024,
+                        temperature: 0.3,
+                        top_p: 0.9,
+                        stream: false
+                    })
+                });
+                if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                const data = await response.json();
+                let reply = data.choices[0].message.content;
+                conversation.push({ role: "assistant", content: reply });
+                trimConversation();
+
+                // Se la lingua è sbagliata, rifai la richiesta forzando la lingua corretta
+                if (isWrongLanguageResponse(userText, reply)) {
+                    const userLang = detectLanguage(userText);
+                    const forcePrompt = `IMPORTANT: The user wrote in ${userLang}. You MUST answer in ${userLang}. Do NOT use any other language.\n\nUser: ${userText}\nAssistant:`;
+                    const retryPayload = {
+                        messages: [
+                            { role: "system", content: SYSTEM_PROMPT },
+                            { role: "user", content: forcePrompt }
+                        ],
+                        max_tokens: 1024,
+                        temperature: 0.3,
+                        top_p: 0.9
+                    };
+                    const retryResponse = await fetch('http://localhost:5001/v1/chat/completions', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(retryPayload)
+                    });
+                    if (retryResponse.ok) {
+                        const retryData = await retryResponse.json();
+                        reply = retryData.choices[0].message.content;
+                        // Sostituisci l'ultimo messaggio dell'assistente nella conversazione
+                        conversation[conversation.length-1].content = reply;
+                    } else {
+                        // Se fallisce il retry, usa il messaggio di errore standard
+                        reply = translations[currentLang].wrongLanguageReply;
+                        conversation[conversation.length-1].content = reply;
+                    }
+                }
+
+                appendMessage('assistant', reply);
+                statusSpan.innerText = translations[currentLang].statusReady;
+                extractContext();
+                saveCurrentConversation();
+                renderConversationsList();
+            } catch(err) {
+                console.error(err);
+                appendMessage('assistant', translations[currentLang].errorServer);
+                statusSpan.innerText = translations[currentLang].statusServerError;
+            } finally {
+                sendBtn.disabled = false;
+                messageInput.focus();
+            }
+        }
+
+        // TEMA
+        const themeToggle = document.getElementById('themeToggle');
+        const loadTheme = () => { const saved = localStorage.getItem('sagavarTheme'); if(saved==='dark'){ document.body.classList.remove('light'); document.body.classList.add('dark'); themeToggle.textContent='☀️'; } else { document.body.classList.remove('dark'); document.body.classList.add('light'); themeToggle.textContent='🌙'; } };
+        themeToggle.addEventListener('click', () => { const isDark = document.body.classList.contains('dark'); if(isDark){ document.body.classList.remove('dark'); document.body.classList.add('light'); localStorage.setItem('sagavarTheme','light'); themeToggle.textContent='🌙'; } else { document.body.classList.remove('light'); document.body.classList.add('dark'); localStorage.setItem('sagavarTheme','dark'); themeToggle.textContent='☀️'; } });
+        loadTheme();
+
+        // GESTIONE LINGUA
+        function applyLanguage(lang) {
+            currentLang = lang;
+            const t = translations[lang];
+            document.getElementById('headerSubtitle').innerText = t.headerSubtitle;
+            document.getElementById('message').placeholder = t.placeholder;
+            document.getElementById('sendBtn').innerHTML = t.sendBtn;
+            document.getElementById('newChatSidebarBtn').innerHTML = t.newChatBtn;
+            document.getElementById('clearAllConversationsBtn').innerHTML = t.clearAllBtn;
+            document.getElementById('conversationsTitle').innerHTML = t.conversationsTitle;
+            document.getElementById('contextTitle').innerHTML = t.contextTitle;
+            if (statusSpan.innerText === translations.en.statusReady || statusSpan.innerText === translations.ru.statusReady || statusSpan.innerText === translations.zh.statusReady) {
+                statusSpan.innerText = t.statusReady;
+            }
+            if (conversation.length === 2 && conversation[1].role === 'assistant' &&
+                (conversation[1].content === translations.en.welcomeMessage ||
+                 conversation[1].content === translations.ru.welcomeMessage ||
+                 conversation[1].content === translations.zh.welcomeMessage)) {
+                conversation[1].content = t.welcomeMessage;
+                renderChat();
+            }
+            const convList = document.getElementById('conversationsList');
+            if (convList.children.length === 1 && (convList.children[0].innerText.includes('No saved') || convList.children[0].innerText.includes('Нет сохранённых') || convList.children[0].innerText.includes('无保存'))) {
+                convList.innerHTML = `<li>${t.noConversations}</li>`;
+            }
+            extractContext();
+            localStorage.setItem('sagavarLang', lang);
+        }
+
+        localStorage.setItem('sagavarLang', 'en');
+        applyLanguage('en');
+        document.querySelectorAll('.lang-btn').forEach(btn => {
+            if (btn.getAttribute('data-lang') === 'en') btn.classList.add('active');
+            else btn.classList.remove('active');
+        });
+
+        const langBtns = document.querySelectorAll('.lang-btn');
+        langBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                const lang = btn.getAttribute('data-lang');
+                langBtns.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                applyLanguage(lang);
+            });
+        });
+
+        document.getElementById('newChatSidebarBtn').addEventListener('click', () => newConversation());
+        document.getElementById('clearAllConversationsBtn').addEventListener('click', () => clearAllConversations());
+        sendBtn.addEventListener('click', sendMessage);
+        messageInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') sendMessage(); });
+
+        window.onload = () => {
+            renderChat();
+            renderConversationsList();
+            extractContext();
+            messageInput.focus();
+        };
+    </script>
+</body>
+</html>
