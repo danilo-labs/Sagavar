@@ -4,106 +4,139 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
     <title>Sagavar · Language Tutor</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600&display=swap" rel="stylesheet">
     <style>
-        /* ========== STILI (TEMA CHIARO/SCURO) – LASCIATI INVARIATI ========== */
+        /* ========== TEMA CAMPUS (chiaro caldo / scuro caldo) — nessuna risorsa esterna, 100% offline ========== */
+        :root {
+            --coral: #ff6b5e; --coral-dark: #e85345; --teal: #0d9488; --teal-light: #2dd4bf;
+            --radius: 18px;
+            --font: -apple-system, BlinkMacSystemFont, "Segoe UI", "PT Sans", Roboto, "DejaVu Sans", "Noto Sans CJK SC", "WenQuanYi Zen Hei", "Noto Sans", sans-serif;
+        }
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Inter', sans-serif; height: 100vh; display: flex; flex-direction: column; overflow: hidden; transition: background 0.2s, color 0.2s; }
-        body.light { background-color: #f9fafb; color: #111827; }
-        body.light .header { background-color: rgba(255,255,255,0.8); backdrop-filter: blur(10px); border-bottom: 1px solid #e5e7eb; }
-        body.light .header h1 { color: #111827; }
-        body.light .header p { color: #6b7280; }
-        body.light .chat-container { background-color: #f9fafb; }
-        body.light .message.user { color: #111827; border-left-color: #3b82f6; }
-        body.light .message.assistant { color: #4b5563; border-left-color: #d1d5db; }
-        body.light .input-panel { background-color: rgba(255,255,255,0.8); backdrop-filter: blur(10px); border-top: 1px solid #e5e7eb; }
-        body.light .input-group { background-color: #ffffff; border: 1px solid #e5e7eb; }
-        body.light .input-group:focus-within { border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59,130,246,0.1); }
-        body.light #message { color: #111827; }
-        body.light #message::placeholder { color: #6b7280; }
-        body.light button { background-color: #111827; color: white; }
-        body.light button:hover { background-color: #374151; }
-        body.light .status { color: #6b7280; }
-        body.light .sidebar { background: rgba(255,255,255,0.6); border-left-color: #e5e7eb; }
-        body.light .sidebar-section { border-bottom-color: #e5e7eb; }
-        body.light .sidebar-section h3 { color: #1f2937; }
-        body.light .convo-list li button.delete-convo { color: #6b7280; }
-        body.light .convo-list li button.delete-convo:hover { background: #e5e7eb; }
-        body.dark { background-color: #0f172a; color: #e2e8f0; }
-        body.dark .header { background-color: rgba(15,23,42,0.8); backdrop-filter: blur(10px); border-bottom: 1px solid #1e293b; }
-        body.dark .header h1 { color: #e2e8f0; }
-        body.dark .header p { color: #94a3b8; }
-        body.dark .chat-container { background-color: #0f172a; }
-        body.dark .message.user { color: #e2e8f0; border-left-color: #38bdf8; }
-        body.dark .message.assistant { color: #94a3b8; border-left-color: #334155; }
-        body.dark .input-panel { background-color: rgba(15,23,42,0.8); backdrop-filter: blur(10px); border-top: 1px solid #1e293b; }
-        body.dark .input-group { background-color: #1e293b; border: 1px solid #334155; }
-        body.dark .input-group:focus-within { border-color: #38bdf8; box-shadow: 0 0 0 3px rgba(56,189,248,0.1); }
-        body.dark #message { color: #f1f5f9; }
-        body.dark #message::placeholder { color: #64748b; }
-        body.dark button { background-color: #38bdf8; color: #0f172a; }
-        body.dark button:hover { background-color: #7dd3fc; }
-        body.dark .status { color: #64748b; }
-        body.dark .sidebar { background: rgba(15,23,42,0.8); border-left-color: #1e293b; }
-        body.dark .sidebar-section { border-bottom-color: #1e293b; }
-        body.dark .sidebar-section h3 { color: #cbd5e1; }
-        body.dark .convo-list li button.delete-convo { color: #94a3b8; }
-        body.dark .convo-list li button.delete-convo:hover { background: #1e293b; }
-        body.light .lang-btn.active { background: #3b82f6; color: white; }
-        body.light .lang-btn:not(.active):hover { background: #e5e7eb; }
-        body.dark .lang-btn { background: transparent; color: #94a3b8; }
-        body.dark .lang-btn.active { background: #38bdf8; color: #0f172a; }
-        body.dark .lang-btn:not(.active):hover { background: #1e293b; }
-        .header { padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; }
-        .header-left { display: flex; flex-direction: column; }
-        .header-controls { display: flex; gap: 0.5rem; align-items: center; }
-        .lang-selector { display: flex; gap: 4px; background: rgba(0,0,0,0.05); border-radius: 2rem; padding: 0.2rem; }
-        .lang-btn { background: transparent; border: none; font-size: 0.8rem; font-weight: 500; padding: 0.3rem 0.7rem; border-radius: 2rem; cursor: pointer; transition: all 0.1s; color: inherit; }
-        #themeToggle { background: transparent; border: none; font-size: 1.3rem; cursor: pointer; padding: 0.4rem; border-radius: 50%; width: 36px; height: 36px; display: inline-flex; align-items: center; justify-content: center; }
-        body.light #themeToggle:hover { background-color: #e5e7eb; }
-        body.dark #themeToggle:hover { background-color: #1e293b; }
-        .header-text h1 { font-size: 1.5rem; font-weight: 600; letter-spacing: -0.3px; }
-        .header-text p { font-size: 0.8rem; margin-top: 2px; }
+        body { font-family: var(--font); height: 100vh; display: flex; flex-direction: column; overflow: hidden; transition: background .2s, color .2s; }
+
+        body.light { background: #faf5ec; color: #3b2f2a; }
+        body.light .header { background: #fffdf8; border-bottom: 2px solid #eee2cf; }
+        body.light .logo { background: var(--coral); color: #fff; box-shadow: 0 4px 0 var(--coral-dark); }
+        body.light .header p { color: #8a7a6e; }
+        body.light .streak { background: #fff3d6; border: 2px solid #ffd166; color: #7a5300; }
+        body.light .lang-btn { border: 2px solid #eee2cf; background: #fffdf8; color: #8a7a6e; }
+        body.light .lang-btn.active { background: var(--teal); border-color: var(--teal); color: #fff; }
+        body.light #themeToggle { border: 2px solid #eee2cf; background: #fffdf8; color: #3b2f2a; }
+        body.light .sidebar { background: #fffdf8; border-right: 2px solid #eee2cf; }
+        body.light .convo { color: #6b5b4f; }
+        body.light .convo.current { background: #e0f2ef; color: var(--teal); }
+        body.light .side-card { background: #fffdf8; border: 2px solid #eee2cf; }
+        body.light .side-h { color: #8a7a6e; }
+        body.light .message.user { background: var(--coral); color: #fff; }
+        body.light .message.assistant { background: #fffdf8; border: 2px solid #eee2cf; }
+        body.light .input-box { background: #fffdf8; border: 2px solid #eee2cf; box-shadow: 3px 3px 0 #eee2cf; }
+        body.light .input-box:focus-within { border-color: var(--teal); }
+        body.light #message { color: #3b2f2a; }
+        body.light #message::placeholder { color: #b3a493; }
+        body.light .status { color: #8a7a6e; }
+        body.light .wotd .py { color: var(--teal); }
+        body.light .wotd small { color: #8a7a6e; }
+        body.light .xp .row { color: #6b5b4f; }
+        body.light .bar { background: #f1e6d2; }
+
+        body.dark { background: #201a14; color: #f0e9df; }
+        body.dark .header { background: #262019; border-bottom: 2px solid #3a3126; }
+        body.dark .logo { background: var(--coral); color: #fff; box-shadow: 0 4px 0 #b23f33; }
+        body.dark .header p { color: #a89a88; }
+        body.dark .streak { background: #3a2f17; border: 2px solid #8a6d1d; color: #ffd166; }
+        body.dark .lang-btn { border: 2px solid #3a3126; background: #262019; color: #a89a88; }
+        body.dark .lang-btn.active { background: var(--teal-light); border-color: var(--teal-light); color: #103c37; }
+        body.dark #themeToggle { border: 2px solid #3a3126; background: #262019; color: #f0e9df; }
+        body.dark .sidebar { background: #262019; border-right: 2px solid #3a3126; }
+        body.dark .convo { color: #c9bba9; }
+        body.dark .convo.current { background: #1d3b36; color: var(--teal-light); }
+        body.dark .side-card { background: #262019; border: 2px solid #3a3126; }
+        body.dark .side-h { color: #a89a88; }
+        body.dark .message.user { background: var(--coral); color: #fff; }
+        body.dark .message.assistant { background: #2a231b; border: 2px solid #3a3126; }
+        body.dark .input-box { background: #2a231b; border: 2px solid #3a3126; box-shadow: 3px 3px 0 #17120c; }
+        body.dark .input-box:focus-within { border-color: var(--teal-light); }
+        body.dark #message { color: #f6f0e6; }
+        body.dark #message::placeholder { color: #7d7061; }
+        body.dark .status { color: #a89a88; }
+        body.dark .wotd .py { color: var(--teal-light); }
+        body.dark .wotd small { color: #a89a88; }
+        body.dark .xp .row { color: #c9bba9; }
+        body.dark .bar { background: #3a3126; }
+
+        /* ========== HEADER ========== */
+        .header { padding: 10px 22px; display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-shrink: 0; }
+        .brand { display: flex; align-items: center; gap: 12px; min-width: 0; }
+        .logo { width: 44px; height: 44px; border-radius: 15px; font-size: 22px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+        .header-text h1 { font-size: 19px; font-weight: 800; letter-spacing: -.3px; }
+        .header-text p { font-size: 12px; font-weight: 550; margin-top: 1px; }
+        .header-controls { display: flex; gap: 8px; align-items: center; flex-shrink: 0; }
+        .lang-selector { display: flex; gap: 6px; }
+        .lang-btn { font: inherit; font-size: 12.5px; font-weight: 700; padding: 6px 13px; border-radius: 999px; cursor: pointer; transition: all .12s; }
+        .streak { display: none; align-items: center; gap: 6px; padding: 7px 14px; border-radius: 999px; font-weight: 750; font-size: 13px; white-space: nowrap; }
+        .streak.visible { display: flex; }
+        #themeToggle { font-size: 15px; cursor: pointer; width: 36px; height: 36px; border-radius: 11px; display: inline-flex; align-items: center; justify-content: center; }
+
+        /* ========== LAYOUT ========== */
         .app-wrapper { display: flex; flex: 1; overflow: hidden; }
         .main-content { flex: 1; display: flex; flex-direction: column; overflow: hidden; min-width: 0; }
-        .sidebar { width: 280px; backdrop-filter: blur(8px); border-left: 1px solid; display: flex; flex-direction: column; padding: 1rem; gap: 1.5rem; overflow-y: auto; flex-shrink: 0; }
+        .sidebar { width: 276px; display: flex; flex-direction: column; gap: 16px; padding: 16px; overflow-y: auto; flex-shrink: 0; }
         @media (max-width: 1000px) { .sidebar { display: none; } }
-        .sidebar-section { border-bottom: 1px solid; padding-bottom: 1rem; }
-        .sidebar-section h3 { font-size: 0.8rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 0.8rem; }
-        .convo-list { list-style: none; margin: 0; padding: 0; }
-        .convo-list li { display: flex; justify-content: space-between; align-items: center; padding: 0.5rem; margin-bottom: 0.25rem; border-radius: 0.5rem; font-size: 0.85rem; }
-        .convo-list li span { cursor: pointer; flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .convo-list li button.delete-convo { background: none; border: none; cursor: pointer; font-size: 0.8rem; padding: 0 4px; border-radius: 4px; }
-        .new-chat-btn { background: #3b82f6; color: white; border: none; width: 100%; padding: 0.5rem; border-radius: 2rem; font-weight: 500; cursor: pointer; margin-bottom: 0.5rem; }
-        .clear-all-btn { background-color: #ef4444; margin-top: 0.5rem; }
-        body.dark .new-chat-btn { background: #38bdf8; color: #0f172a; }
-        body.dark .clear-all-btn { background-color: #dc2626; color: white; }
-        .context-item { font-size: 0.85rem; margin-bottom: 0.4rem; }
-        .context-label { font-weight: 600; margin-right: 0.3rem; }
-        .chat-container { flex: 1; overflow-y: auto; padding: 1.5rem 2rem; scroll-behavior: smooth; }
-        .message { max-width: 800px; margin: 0 auto 1.2rem auto; padding: 0.75rem 0 0.75rem 1rem; line-height: 1.5; font-size: 0.95rem; animation: fadeSlideUp 0.2s ease; border-left-width: 3px; border-left-style: solid; }
-        @media (min-width: 1400px) { .message { max-width: 1000px; } }
-        .message.user { border-left-color: #3b82f6; }
-        .message.assistant { border-left-color: #d1d5db; }
-        body.dark .message.user { border-left-color: #38bdf8; }
-        body.dark .message.assistant { border-left-color: #334155; }
-        .input-panel { flex-shrink: 0; padding: 1rem 2rem 1.5rem; border-top: 1px solid; }
-        .input-group { max-width: 800px; margin: 0 auto; display: flex; gap: 12px; align-items: center; border-radius: 2rem; padding: 0.25rem 0.25rem 0.25rem 1.5rem; transition: all 0.2s; }
-        #message { flex: 1; background: transparent; border: none; padding: 0.85rem 0; font-size: 0.95rem; outline: none; font-family: inherit; }
-        button { border: none; padding: 0.6rem 1.5rem; border-radius: 2rem; font-weight: 500; font-size: 0.85rem; cursor: pointer; transition: all 0.15s; }
-        button:active { transform: scale(0.97); }
-        .status { text-align: center; font-size: 0.7rem; margin-top: 0.75rem; display: flex; align-items: center; justify-content: center; gap: 6px; }
-        .status-dot { width: 6px; height: 6px; background-color: #10b981; border-radius: 50%; display: inline-block; box-shadow: 0 0 4px #10b981; }
-        @keyframes fadeSlideUp { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+        .sidebar-section { display: flex; flex-direction: column; gap: 8px; }
+        .side-h { font-size: 12px; font-weight: 800; letter-spacing: .4px; text-transform: uppercase; }
+        .convo-list { list-style: none; }
+        .convo-list li { display: flex; justify-content: space-between; align-items: center; padding: 10px 12px; border-radius: 12px; font-size: 13.5px; font-weight: 600; cursor: pointer; }
+        .convo-list li span { flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .convo-list li button.delete-convo { background: none; border: none; cursor: pointer; font-size: .8rem; padding: 2px 4px; border-radius: 6px; }
+        .new-chat-btn { background: var(--coral); color: #fff; border: none; width: 100%; padding: 12px; border-radius: 14px; font: inherit; font-size: 14px; font-weight: 750; cursor: pointer; box-shadow: 0 4px 0 var(--coral-dark); transition: transform .06s, box-shadow .06s; }
+        .new-chat-btn:active { transform: translateY(2px); box-shadow: 0 2px 0 var(--coral-dark); }
+        .clear-all-btn { background: none; border: 2px dashed #d6a79f; color: #b3554a; box-shadow: none; font-size: 12.5px; padding: 9px; border-radius: 12px; width: 100%; cursor: pointer; }
+        body.dark .clear-all-btn { border-color: #6b3f38; color: #e79b91; }
+        .context-item { font-size: 13px; line-height: 1.6; }
+        .context-label { font-weight: 700; margin-right: .3rem; }
+
+        /* card laterali (XP + word of the day) */
+        .side-card { border-radius: 14px; padding: 12px; }
+        .xp .row { display: flex; justify-content: space-between; font-size: 12.5px; font-weight: 700; margin-bottom: 6px; }
+        .bar { height: 10px; border-radius: 999px; overflow: hidden; }
+        .bar i { display: block; height: 100%; width: 0%; background: linear-gradient(90deg, #ffb703, var(--coral)); border-radius: 999px; transition: width .4s; }
+        .wotd { text-align: center; }
+        .wotd .zh { font-size: 26px; font-weight: 800; }
+        .wotd .py { font-weight: 700; font-size: 13px; margin: 2px 0 4px; }
+        .wotd small { font-size: 11.5px; }
+
+        /* ========== CHAT ========== */
+        .chat-container { flex: 1; overflow-y: auto; padding: 26px 24px; scroll-behavior: smooth; }
+        #chat { max-width: 720px; margin: 0 auto; display: flex; flex-direction: column; gap: 14px; }
+        .message { max-width: 82%; padding: 13px 18px; border-radius: 20px; font-size: 15px; line-height: 1.6; animation: fadeSlideUp .22s ease; white-space: pre-wrap; word-wrap: break-word; }
+        .message.user { align-self: flex-end; border-bottom-right-radius: 6px; font-weight: 600; }
+        .message.assistant { align-self: flex-start; border-bottom-left-radius: 6px; }
+        .typing-cursor { display: inline-block; animation: blink 1s step-start infinite; opacity: .6; }
+        @keyframes blink { 50% { opacity: 0; } }
+        @keyframes fadeSlideUp { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+
+        /* ========== INPUT ========== */
+        .input-panel { flex-shrink: 0; padding: 14px 24px 18px; }
+        .input-row { max-width: 720px; margin: 0 auto; display: flex; gap: 10px; align-items: center; }
+        .input-box { flex: 1; display: flex; align-items: center; border-radius: 999px; padding: 5px 5px 5px 20px; transition: border-color .15s; }
+        #message { flex: 1; background: transparent; border: none; outline: none; padding: 12px 0; font-size: 14.5px; font-family: inherit; }
+        .send-btn { width: 52px; height: 52px; flex-shrink: 0; border: none; border-radius: 50%; background: var(--teal); color: #fff; font-size: 19px; cursor: pointer; box-shadow: 0 4px 0 #0a7d73; transition: transform .06s, box-shadow .06s; }
+        .send-btn:active { transform: translateY(2px); box-shadow: 0 2px 0 #0a7d73; }
+        .send-btn:disabled { opacity: .6; cursor: default; }
+        body.dark .send-btn { background: var(--teal-light); color: #103c37; box-shadow: 0 4px 0 #0d5f57; }
+        .status { text-align: center; font-size: 12px; font-weight: 650; margin-top: 10px; display: flex; align-items: center; justify-content: center; gap: 6px; }
+        .status-dot { width: 7px; height: 7px; background: #10b981; border-radius: 50%; display: inline-block; box-shadow: 0 0 5px #10b981; }
+
         .chat-container::-webkit-scrollbar { width: 5px; }
         .chat-container::-webkit-scrollbar-track { background: transparent; }
-        body.light .chat-container::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
-        body.dark .chat-container::-webkit-scrollbar-thumb { background: #334155; border-radius: 10px; }
+        body.light .chat-container::-webkit-scrollbar-thumb { background: #e0d2ba; border-radius: 10px; }
+        body.dark .chat-container::-webkit-scrollbar-thumb { background: #3a3126; border-radius: 10px; }
     </style>
 </head>
 <body class="light">
     <div class="header">
-        <div class="header-left">
+        <div class="brand">
+            <div class="logo">⚡</div>
             <div class="header-text">
                 <h1>Sagavar</h1>
                 <p id="headerSubtitle">offline AI tutor · English · Russian · Chinese</p>
@@ -115,6 +148,7 @@
                 <button data-lang="ru" class="lang-btn">🇷🇺 RU</button>
                 <button data-lang="zh" class="lang-btn">🇨🇳 中文</button>
             </div>
+            <span class="streak" id="streakChip" title=""></span>
             <button id="themeToggle" aria-label="Toggle theme">🌙</button>
         </div>
     </div>
@@ -123,9 +157,11 @@
         <div class="main-content">
             <div class="chat-container"><div id="chat"></div></div>
             <div class="input-panel">
-                <div class="input-group">
-                    <input type="text" id="message" placeholder="Ask me a language question..." autofocus>
-                    <button id="sendBtn">Send →</button>
+                <div class="input-row">
+                    <div class="input-box">
+                        <input type="text" id="message" placeholder="Ask me a language question..." autofocus>
+                    </div>
+                    <button class="send-btn" id="sendBtn" title="Send">➤</button>
                 </div>
                 <div class="status"><span class="status-dot"></span><span id="status">Ready</span></div>
             </div>
@@ -133,14 +169,24 @@
         <div class="sidebar">
             <div class="sidebar-section">
                 <button id="newChatSidebarBtn" class="new-chat-btn">✨ New conversation</button>
-                <button id="clearAllConversationsBtn" class="new-chat-btn clear-all-btn">🗑️ Clear all</button>
+                <button id="clearAllConversationsBtn" class="clear-all-btn">🗑️ Clear all</button>
             </div>
             <div class="sidebar-section">
-                <h3 id="conversationsTitle">💬 Conversations</h3>
+                <div class="side-h" id="conversationsTitle">💬 Conversations</div>
                 <ul id="conversationsList" class="convo-list"><li>No saved conversations</li></ul>
             </div>
+            <div class="sidebar-section side-card xp">
+                <div class="row"><span id="xpLevel">Level 1</span><span id="xpCount">0 / 100 XP</span></div>
+                <div class="bar"><i id="xpBarFill"></i></div>
+            </div>
+            <div class="sidebar-section side-card wotd">
+                <div class="side-h" id="wotdTitle">📖 Word of the day</div>
+                <div class="zh" id="wotdZh">你好</div>
+                <div class="py" id="wotdPy">nǐ hǎo</div>
+                <small id="wotdMeaning">hello</small>
+            </div>
             <div class="sidebar-section">
-                <h3 id="contextTitle">📌 Current context</h3>
+                <div class="side-h" id="contextTitle">📌 Current context</div>
                 <div id="contextDisplay"><div class="context-item">No stored data</div></div>
             </div>
         </div>
@@ -151,9 +197,8 @@
         const translations = {
             en: {
                 headerSubtitle: "offline AI tutor · English · Russian · Chinese",
-                placeholder: "Ask me a language question...",
-                sendBtn: "Send →",
-                statusReady: "Ready",
+                placeholder: "Type your question…",
+                statusReady: "Ready · 100% offline",
                 statusThinking: "Sagavar is thinking...",
                 statusServerError: "Server error",
                 newChatBtn: "✨ New conversation",
@@ -167,14 +212,17 @@
                 deletedSingle: "Conversation deleted",
                 deletedAll: "All conversations deleted",
                 errorServer: "⚠️ Server unreachable. Make sure KoboldCpp is running on port 5001.",
-                welcomeMessage: "Hello! I'm Sagavar, your offline language tutor. Ask me about English, Russian, or Chinese.",
-                wrongLanguageReply: "⚠️ I'm sorry, I can only answer in the language you used. Please ask again in English, Russian, or Chinese."
+                welcomeMessage: "Hi! I'm Sagavar ⚡ — your offline tutor. Let's practice together: English, Russian or Chinese!",
+                streakChip: "🔥 {n}-day streak",
+                streakTitle: "Days in a row you practiced with Sagavar",
+                xpLevel: "Level {n}",
+                xpCount: "{x} / 100 XP",
+                wotdTitle: "📖 Word of the day"
             },
             ru: {
                 headerSubtitle: "офлайн AI репетитор · Английский · Русский · Китайский",
-                placeholder: "Задайте вопрос о языке...",
-                sendBtn: "Отправить →",
-                statusReady: "Готов",
+                placeholder: "Задайте вопрос о языке…",
+                statusReady: "Готово · 100% офлайн",
                 statusThinking: "Sagavar думает...",
                 statusServerError: "Ошибка сервера",
                 newChatBtn: "✨ Новый чат",
@@ -188,14 +236,17 @@
                 deletedSingle: "Диалог удалён",
                 deletedAll: "Все диалоги удалены",
                 errorServer: "⚠️ Сервер недоступен. Убедитесь, что KoboldCpp запущен на порту 5001.",
-                welcomeMessage: "Привет! Я Sagavar, ваш офлайн репетитор языков. Спрашивайте меня об английском, русском или китайском.",
-                wrongLanguageReply: "⚠️ Извините, я могу отвечать только на том языке, который вы использовали. Пожалуйста, спросите снова на английском, русском или китайском."
+                welcomeMessage: "Привет! Я Sagavar ⚡ — ваш офлайн репетитор. Давайте практиковаться: английский, русский или китайский!",
+                streakChip: "🔥 серия: {n} дн.",
+                streakTitle: "Дней подряд вы занимались с Sagavar",
+                xpLevel: "Уровень {n}",
+                xpCount: "{x} / 100 XP",
+                wotdTitle: "📖 Слово дня"
             },
             zh: {
                 headerSubtitle: "离线AI导师 · 英语 · 俄语 · 中文",
-                placeholder: "提出语言问题...",
-                sendBtn: "发送 →",
-                statusReady: "就绪",
+                placeholder: "输入你的问题…",
+                statusReady: "就绪 · 100% 离线",
                 statusThinking: "Sagavar 思考中...",
                 statusServerError: "服务器错误",
                 newChatBtn: "✨ 新对话",
@@ -209,56 +260,24 @@
                 deletedSingle: "对话已删除",
                 deletedAll: "所有对话已删除",
                 errorServer: "⚠️ 服务器无法访问。请确保 KoboldCpp 在端口 5001 上运行。",
-                welcomeMessage: "你好！我是 Sagavar，您的离线语言导师。请问我关于英语、俄语或中文的问题。",
-                wrongLanguageReply: "⚠️ 抱歉，我只能用您使用的语言回答。请用英语、俄语或中文重新提问。"
+                welcomeMessage: "你好！我是 Sagavar ⚡ — 你的离线导师。一起来练习英语、俄语或中文吧！",
+                streakChip: "🔥 连续 {n} 天",
+                streakTitle: "你连续使用 Sagavar 练习的天数",
+                xpLevel: "等级 {n}",
+                xpCount: "{x} / 100 XP",
+                wotdTitle: "📖 每日一词"
             }
         };
 
         let currentLang = 'en';
 
-        const SYSTEM_PROMPT = `You are Sagavar, a friendly language tutor for English, Russian, Chinese.
-
-CRITICAL RULES (must follow in this order):
-1. The user's language is the ONLY language you should answer in. 
-   - If the user writes in English → you MUST answer in English.
-   - If the user writes in Russian → you MUST answer in Russian.
-   - If the user writes in Chinese → you MUST answer in Chinese.
-2. NEVER switch language unless the user explicitly asks for a translation.
-3. When the user asks for a phrase in a specific language (e.g., "in Russian", "in Chinese"), answer ONLY in that language.
-4. For English grammar questions: answer ONLY in English. Never use Russian or Chinese characters.
-5. For Chinese: always provide pinyin in parentheses (e.g., 你好 nǐ hǎo).
-6. For Russian: use Cyrillic alphabet. If unsure, say "I need to check".
-7. Remember what the user tells you (name, preferences, etc.) during the conversation.
-8. Keep answers short, clear, and helpful.
-9. Your name is Sagavar.
-10. When introducing yourself, say: "Hello, I'm Sagavar, your offline language tutor."
-
---- Examples of WRONG behavior (NEVER do this) ---
-User: Say 'hello' in Chinese.
-WRONG: Hello (English)
-WRONG: 你好 (without pinyin)
-CORRECT: 你好 (nǐ hǎo)
-
-User: Translate 'thank you' into Russian.
-WRONG: Спасибо (that is correct, but the point is to answer in Russian)
-CORRECT: Спасибо
-
-User: My name is Olga.
-WRONG: 你好，Olga！
-CORRECT: Hello, Olga! Nice to meet you.
-
---- Good examples ---
-User: How to say 'hello' in Chinese?
-Assistant: 你好 (nǐ hǎo)
-
-User: What is the Russian word for 'goodbye'?
-Assistant: до свидания
-
-User: Translate 'Thank you' into Russian.
-Assistant: Спасибо
-
-User: Say 'good morning' in Chinese.
-Assistant: 早上好 (zǎoshang hǎo)`;
+        const SYSTEM_PROMPT = `You are Sagavar, a friendly offline language tutor for English, Russian and Chinese.
+Rules:
+1. Reply in the SAME language the user wrote in (English, Russian or Chinese).
+2. If the user asks how to say something in another language, answer with the phrase itself; for Chinese always add pinyin in parentheses, e.g. 你好 (nǐ hǎo).
+3. Stay on language-learning topics; politely redirect anything else back to languages.
+4. Keep answers short, clear and correct. If unsure about grammar, say you are not sure.
+5. Your name is Sagavar.`;
 
         let conversation = [
             { role: "system", content: SYSTEM_PROMPT },
@@ -274,31 +293,98 @@ Assistant: 早上好 (zǎoshang hǎo)`;
         const contextDisplayEl = document.getElementById('contextDisplay');
 
         function escapeHtml(text) { const div = document.createElement('div'); div.textContent = text; return div.innerHTML; }
-        function appendMessage(role, content) { const msgDiv = document.createElement('div'); msgDiv.className = `message ${role}`; msgDiv.innerHTML = escapeHtml(content); chatDiv.appendChild(msgDiv); document.querySelector('.chat-container').scrollTop = document.querySelector('.chat-container').scrollHeight; }
+        function appendMessage(role, content) { const msgDiv = document.createElement('div'); msgDiv.className = `message ${role}`; msgDiv.innerHTML = escapeHtml(content); chatDiv.appendChild(msgDiv); document.querySelector('.chat-container').scrollTop = document.querySelector('.chat-container').scrollHeight; return msgDiv; }
         function renderChat() { chatDiv.innerHTML = ''; for (let msg of conversation) if (msg.role !== 'system') appendMessage(msg.role, msg.content); }
-        function trimConversation() { const MAX_TURNS = 6; if (conversation.length > MAX_TURNS*2+1) { const keepSystem = conversation[0]; const lastMessages = conversation.slice(-MAX_TURNS*2); conversation = [keepSystem, ...lastMessages]; } }
+        function trimConversation() { const MAX_TURNS = 8; if (conversation.length > MAX_TURNS*2+1) { const keepSystem = conversation[0]; const lastMessages = conversation.slice(-MAX_TURNS*2); conversation = [keepSystem, ...lastMessages]; } }
 
+        // Lingua per "script dominante": conta i caratteri cinesi, cirillici e latini.
+        // Così una risposta inglese che cita 你好 resta inglese (prima veniva
+        // classificata cinese e scatenava un retry inutile).
         function detectLanguage(text) {
-            if (/[\u4e00-\u9fff]/.test(text)) return 'zh';
-            if (/[\u0400-\u04FF]/.test(text)) return 'ru';
+            const han = (text.match(/[\u4e00-\u9fff]/g) || []).length;
+            const cyr = (text.match(/[\u0400-\u04FF]/g) || []).length;
+            const lat = (text.match(/[A-Za-z\u00C0-\u024F]/g) || []).length;
+            if (han > cyr && han > lat) return 'zh';
+            if (cyr > han && cyr > lat) return 'ru';
+            if (lat > han && lat > cyr) return 'en';
+            if (han > 0) return 'zh';
+            if (cyr > 0) return 'ru';
             return 'en';
         }
 
-        // Verifica se la risposta è nella lingua sbagliata
+        // Verifica se la risposta è nella lingua sbagliata: con il rilevamento a
+        // script dominante è sufficiente il confronto diretto (una citazione breve
+        // nell'altra lingua non cambia lo script dominante della risposta).
         function isWrongLanguageResponse(userMsg, reply) {
-            const userLang = detectLanguage(userMsg);
-            const replyLang = detectLanguage(reply);
-            if (userLang === 'en' && (replyLang === 'zh' || replyLang === 'ru')) return true;
-            if (userLang === 'zh' && replyLang === 'en') return true;
-            if (userLang === 'ru' && replyLang === 'en') return true;
-            return false;
+            return detectLanguage(userMsg) !== detectLanguage(reply);
         }
 
-        // Filtro minimale per domande non linguistiche
-        function isNonLanguageQuestion(text) {
-            const lower = text.toLowerCase();
-            const blocked = ["capital", "2+2", "3+3", "4+4", "math", "solve", "calculate", "joke", "tell me a joke", "funny", "weather"];
-            return blocked.some(kw => lower.includes(kw));
+        const LANG_NAMES = { en: 'English', ru: 'Russian', zh: 'Chinese (Simplified)' };
+
+        // ===================== PROGRESSO REALE (streak, XP, word of the day) =====================
+        // Dati veri, calcolati dall'uso effettivo: niente elementi decorativi finti.
+        const DAY_MS = 86400000;
+        const WORDS = [
+            { zh: '你好', py: 'nǐ hǎo', en: 'hello', ru: 'привет' },
+            { zh: '谢谢', py: 'xiè xie', en: 'thank you', ru: 'спасибо' },
+            { zh: '学习', py: 'xué xí', en: 'to study', ru: 'учиться' },
+            { zh: '朋友', py: 'péng you', en: 'friend', ru: 'друг' },
+            { zh: '时间', py: 'shí jiān', en: 'time', ru: 'время' },
+            { zh: '水', py: 'shuǐ', en: 'water', ru: 'вода' },
+            { zh: '书', py: 'shū', en: 'book', ru: 'книга' },
+            { zh: '爱', py: 'ài', en: 'love', ru: 'любовь' },
+            { zh: '明天', py: 'míng tiān', en: 'tomorrow', ru: 'завтра' },
+            { zh: '今天', py: 'jīn tiān', en: 'today', ru: 'сегодня' },
+            { zh: '昨天', py: 'zuó tiān', en: 'yesterday', ru: 'вчера' },
+            { zh: '工作', py: 'gōng zuò', en: 'work', ru: 'работа' },
+            { zh: '名字', py: 'míng zi', en: 'name', ru: 'имя' },
+            { zh: '再见', py: 'zài jiàn', en: 'goodbye', ru: 'до свидания' },
+            { zh: '对不起', py: 'duì bu qǐ', en: 'sorry', ru: 'извини' },
+            { zh: '没关系', py: 'méi guān xì', en: "it's okay", ru: 'ничего страшного' },
+            { zh: '怎么', py: 'zěn me', en: 'how', ru: 'как' },
+            { zh: '多少', py: 'duō shǎo', en: 'how much', ru: 'сколько' },
+            { zh: '吃饭', py: 'chī fàn', en: 'to eat', ru: 'есть, кушать' },
+            { zh: '学生', py: 'xué shēng', en: 'student', ru: 'студент' },
+            { zh: '老师', py: 'lǎo shī', en: 'teacher', ru: 'учитель' },
+            { zh: '汉语', py: 'hàn yǔ', en: 'Chinese language', ru: 'китайский язык' },
+            { zh: '一点', py: 'yì diǎn', en: 'a little', ru: 'немного' },
+            { zh: '好', py: 'hǎo', en: 'good', ru: 'хорошо' }
+        ];
+
+        function todayKey() { const d = new Date(); return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`; }
+        function loadUsage() { try { return JSON.parse(localStorage.getItem('sagavar_usage')) || { lastDay: null, streak: 0, xp: 0 }; } catch (e) { return { lastDay: null, streak: 0, xp: 0 }; } }
+        function saveUsage(u) { localStorage.setItem('sagavar_usage', JSON.stringify(u)); }
+        function registerActivity() {
+            const u = loadUsage();
+            const today = todayKey();
+            if (u.lastDay !== today) {
+                const y = new Date(Date.now() - DAY_MS);
+                const yest = `${y.getFullYear()}-${String(y.getMonth()+1).padStart(2,'0')}-${String(y.getDate()).padStart(2,'0')}`;
+                u.streak = (u.lastDay === yest) ? (u.streak || 0) + 1 : 1;
+                u.lastDay = today;
+                saveUsage(u);
+            }
+            return u;
+        }
+        function addXp(n) { const u = registerActivity(); u.xp = (u.xp || 0) + n; saveUsage(u); renderProgress(); }
+        function renderProgress() {
+            const u = registerActivity();
+            const t = translations[currentLang];
+            const lvl = Math.floor(u.xp / 100) + 1;
+            const into = u.xp % 100;
+            const chip = document.getElementById('streakChip');
+            chip.textContent = t.streakChip.replace('{n}', u.streak);
+            chip.title = t.streakTitle;
+            chip.classList.toggle('visible', u.streak > 0);
+            document.getElementById('xpLevel').textContent = t.xpLevel.replace('{n}', lvl);
+            document.getElementById('xpCount').textContent = t.xpCount.replace('{x}', into);
+            document.getElementById('xpBarFill').style.width = into + '%';
+            const dayOfYear = Math.floor((Date.now() - new Date(new Date().getFullYear(), 0, 0)) / DAY_MS);
+            const w = WORDS[dayOfYear % WORDS.length];
+            document.getElementById('wotdTitle').textContent = t.wotdTitle;
+            document.getElementById('wotdZh').textContent = w.zh;
+            document.getElementById('wotdPy').textContent = w.py;
+            document.getElementById('wotdMeaning').textContent = (currentLang === 'ru') ? w.ru : w.en;
         }
 
         function extractContext() {
@@ -306,12 +392,12 @@ Assistant: 早上好 (zǎoshang hǎo)`;
             for (let msg of conversation) {
                 if (msg.role !== 'user') continue;
                 const lower = msg.content.toLowerCase();
-                let match = lower.match(/(?:my name is|i'm|i am|call me) (\w+)/i);
+                let match = lower.match(/(?:my name is|i'm|i am|call me|меня зовут|我叫) ?([\wа-яё]+)/i);
                 if (match && !name) name = match[1];
-                match = lower.match(/(?:i live in|from) (\w+)/i);
+                match = lower.match(/(?:i live in|from|я живу в|живу в) ([\wа-яё]+)/i);
                 if (match && !city) city = match[1];
-                match = lower.match(/i study (.+)/i);
-                if (match) languages.push(...match[1].split(/ and |, /));
+                match = lower.match(/i study (.+)|я учу (.+)/i);
+                if (match) languages.push(...(match[1] || match[2]).split(/ and |, | и /));
             }
             const t = translations[currentLang];
             contextDisplayEl.innerHTML = '';
@@ -363,80 +449,97 @@ Assistant: 早上好 (zǎoshang hǎo)`;
             const t = translations[currentLang];
             if (!convs.length) { conversationsListEl.innerHTML = `<li>${t.noConversations}</li>`; return; }
             let html = '';
-            for (let c of convs) html += `<li data-id="${c.id}"><span>${escapeHtml(c.title)}</span><button class="delete-convo" data-id="${c.id}">🗑️</button></li>`;
+            for (let c of convs) html += `<li data-id="${c.id}"${c.id === currentConversationId ? ' style="font-weight:800"' : ''}><span>${escapeHtml(c.title)}</span><button class="delete-convo" data-id="${c.id}">🗑️</button></li>`;
             conversationsListEl.innerHTML = html;
             document.querySelectorAll('#conversationsList li span').forEach(span => span.addEventListener('click', (e) => { const id = span.closest('li').getAttribute('data-id'); if(id) loadConversation(id); }));
             document.querySelectorAll('#conversationsList .delete-convo').forEach(btn => btn.addEventListener('click', (e) => { e.stopPropagation(); const id = btn.getAttribute('data-id'); if(confirm(t.confirmDeleteSingle)){ let convs = getStoredConversations(); convs = convs.filter(c=>c.id!==id); saveConversationsToStorage(convs); if(currentConversationId===id) currentConversationId=null; renderConversationsList(); }}));
         }
         function clearAllConversations() { const t = translations[currentLang]; if(confirm(t.confirmDeleteAll)){ localStorage.removeItem('sagavar_conversations'); currentConversationId=null; renderConversationsList(); } }
 
+        // Chiamata al modello con streaming SSE: i token appaiono in tempo reale
+        // (su CPU lente la risposta completa può metterci oltre un minuto: senza
+        // streaming l'utente non vede nulla fino alla fine)
+        async function chatStream(messages, msgDiv) {
+            const response = await fetch('http://localhost:5001/v1/chat/completions', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    messages: messages,
+                    max_tokens: 512,
+                    temperature: 0.3,
+                    top_p: 0.9,
+                    stream: true
+                })
+            });
+            if (!response.ok) throw new Error(`HTTP ${response.status}`);
+            // Fallback: risposta JSON tradizionale se lo streaming non è disponibile
+            if (!response.body || !response.body.getReader) {
+                const data = await response.json();
+                return data.choices[0].message.content;
+            }
+            const reader = response.body.getReader();
+            const decoder = new TextDecoder();
+            let reply = '', buffer = '';
+            const scroll = () => { document.querySelector('.chat-container').scrollTop = document.querySelector('.chat-container').scrollHeight; };
+            while (true) {
+                const { done, value } = await reader.read();
+                if (done) break;
+                buffer += decoder.decode(value, { stream: true });
+                const lines = buffer.split('\n');
+                buffer = lines.pop();
+                for (const line of lines) {
+                    const s = line.trim();
+                    if (!s.startsWith('data:')) continue;
+                    const payload = s.slice(5).trim();
+                    if (!payload || payload === '[DONE]') continue;
+                    try {
+                        const delta = JSON.parse(payload).choices?.[0]?.delta?.content;
+                        if (delta) reply += delta;
+                    } catch (e) { /* chunk SSE incompleto: lo scarta, arriva col prossimo byte */ }
+                }
+                msgDiv.innerHTML = escapeHtml(reply) + '<span class="typing-cursor">▌</span>';
+                scroll();
+            }
+            msgDiv.innerHTML = escapeHtml(reply);
+            return reply;
+        }
+
         // Funzione principale con RETRY sulla lingua
         async function sendMessage() {
             const userText = messageInput.value.trim();
             if (!userText || userText.length > 600) return;
 
-            if (isNonLanguageQuestion(userText)) {
-                appendMessage('assistant', translations[currentLang].wrongLanguageReply);
-                statusSpan.innerText = translations[currentLang].statusReady;
-                return;
-            }
-
             messageInput.value = '';
             appendMessage('user', userText);
-            conversation.push({ role: "user", content: userText });
+            conversation.push({ role: 'user', content: userText });
+            addXp(10); // progresso reale: ogni domanda conta
             statusSpan.innerText = translations[currentLang].statusThinking;
             sendBtn.disabled = true;
 
             try {
-                // Primo tentativo
-                const response = await fetch('http://localhost:5001/v1/chat/completions', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        messages: conversation,
-                        max_tokens: 1024,
-                        temperature: 0.3,
-                        top_p: 0.9,
-                        stream: false
-                    })
-                });
-                if (!response.ok) throw new Error(`HTTP ${response.status}`);
-                const data = await response.json();
-                let reply = data.choices[0].message.content;
-                conversation.push({ role: "assistant", content: reply });
+                const replyDiv = appendMessage('assistant', '');
+                let reply = await chatStream(conversation, replyDiv);
+                conversation.push({ role: 'assistant', content: reply });
                 trimConversation();
 
                 // Se la lingua è sbagliata, rifai la richiesta forzando la lingua corretta
                 if (isWrongLanguageResponse(userText, reply)) {
-                    const userLang = detectLanguage(userText);
-                    const forcePrompt = `IMPORTANT: The user wrote in ${userLang}. You MUST answer in ${userLang}. Do NOT use any other language.\n\nUser: ${userText}\nAssistant:`;
-                    const retryPayload = {
-                        messages: [
-                            { role: "system", content: SYSTEM_PROMPT },
-                            { role: "user", content: forcePrompt }
-                        ],
-                        max_tokens: 1024,
-                        temperature: 0.3,
-                        top_p: 0.9
-                    };
-                    const retryResponse = await fetch('http://localhost:5001/v1/chat/completions', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify(retryPayload)
-                    });
-                    if (retryResponse.ok) {
-                        const retryData = await retryResponse.json();
-                        reply = retryData.choices[0].message.content;
-                        // Sostituisci l'ultimo messaggio dell'assistente nella conversazione
-                        conversation[conversation.length-1].content = reply;
+                    const langName = LANG_NAMES[detectLanguage(userText)] || 'English';
+                    const retryMessages = [
+                        { role: "system", content: SYSTEM_PROMPT },
+                        { role: "user", content: `IMPORTANT: the user wrote in ${langName}. You MUST reply ONLY in ${langName}. Do NOT use any other language.\n\nUser: ${userText}` }
+                    ];
+                    const retryDiv = appendMessage('assistant', '');
+                    const retry = await chatStream(retryMessages, retryDiv);
+                    // Sostituisci la risposta sbagliata con quella corretta
+                    if (retry.trim()) {
+                        replyDiv.remove();
+                        conversation[conversation.length - 1].content = retry;
                     } else {
-                        // Se fallisce il retry, usa il messaggio di errore standard
-                        reply = translations[currentLang].wrongLanguageReply;
-                        conversation[conversation.length-1].content = reply;
+                        retryDiv.remove();
                     }
                 }
 
-                appendMessage('assistant', reply);
                 statusSpan.innerText = translations[currentLang].statusReady;
                 extractContext();
                 saveCurrentConversation();
@@ -463,12 +566,12 @@ Assistant: 早上好 (zǎoshang hǎo)`;
             const t = translations[lang];
             document.getElementById('headerSubtitle').innerText = t.headerSubtitle;
             document.getElementById('message').placeholder = t.placeholder;
-            document.getElementById('sendBtn').innerHTML = t.sendBtn;
-            document.getElementById('newChatSidebarBtn').innerHTML = t.newChatBtn;
-            document.getElementById('clearAllConversationsBtn').innerHTML = t.clearAllBtn;
-            document.getElementById('conversationsTitle').innerHTML = t.conversationsTitle;
-            document.getElementById('contextTitle').innerHTML = t.contextTitle;
-            if (statusSpan.innerText === translations.en.statusReady || statusSpan.innerText === translations.ru.statusReady || statusSpan.innerText === translations.zh.statusReady) {
+            document.getElementById('newChatSidebarBtn').innerText = t.newChatBtn;
+            document.getElementById('clearAllConversationsBtn').innerText = t.clearAllBtn;
+            document.getElementById('conversationsTitle').innerText = t.conversationsTitle;
+            document.getElementById('contextTitle').innerText = t.contextTitle;
+            if (statusSpan.innerText === translations.en.statusReady || statusSpan.innerText === translations.ru.statusReady || statusSpan.innerText === translations.zh.statusReady
+                || statusSpan.innerText === translations.en.statusServerError || statusSpan.innerText === translations.ru.statusServerError || statusSpan.innerText === translations.zh.statusServerError) {
                 statusSpan.innerText = t.statusReady;
             }
             if (conversation.length === 2 && conversation[1].role === 'assistant' &&
@@ -483,13 +586,14 @@ Assistant: 早上好 (zǎoshang hǎo)`;
                 convList.innerHTML = `<li>${t.noConversations}</li>`;
             }
             extractContext();
+            renderProgress();
             localStorage.setItem('sagavarLang', lang);
         }
 
-        localStorage.setItem('sagavarLang', 'en');
-        applyLanguage('en');
+        const savedLang = ['en','ru','zh'].includes(localStorage.getItem('sagavarLang')) ? localStorage.getItem('sagavarLang') : 'en';
+        applyLanguage(savedLang);
         document.querySelectorAll('.lang-btn').forEach(btn => {
-            if (btn.getAttribute('data-lang') === 'en') btn.classList.add('active');
+            if (btn.getAttribute('data-lang') === savedLang) btn.classList.add('active');
             else btn.classList.remove('active');
         });
 
@@ -512,6 +616,7 @@ Assistant: 早上好 (zǎoshang hǎo)`;
             renderChat();
             renderConversationsList();
             extractContext();
+            renderProgress();
             messageInput.focus();
         };
     </script>
