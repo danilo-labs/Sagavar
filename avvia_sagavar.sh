@@ -1,11 +1,11 @@
 #!/bin/bash
+cd "$(dirname "$0")"
 # ============================================================
 #  Sagavar Launcher v2.3 — Offline AI Language Tutor
 #  Simply Linux 11 / ALT / Ubuntu / Debian (Xfce)
 #  Backend: KoboldCpp (file locali) OPPURE Ollama (se installato).
 #  Primo avvio con internet per lo scaricamento; poi 100% offline.
 # ============================================================
-cd "$(dirname "$0")" || exit 1
 exec > >(tee -a sagavar.log) 2>&1
 echo "=== Sagavar started at $(date) ==="
 
